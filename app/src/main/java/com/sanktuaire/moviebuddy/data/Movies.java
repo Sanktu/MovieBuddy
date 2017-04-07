@@ -4,7 +4,7 @@ package com.sanktuaire.moviebuddy.data;
  * Created by Sanktuaire on 2017-04-07.
  */
 
-public class Movie {
+public class Movies {
     private String  mOriginalTitle;
     private String  mOverview;
     private Float   mVoteAverage;
@@ -12,7 +12,7 @@ public class Movie {
     private String  mBackdropPath;
     private String  mReleaseDate;
 
-    public Movie(String originalTitle, String overview, Float voteAverage, String posterPath, String backdropPath, String releaseDate) {
+    public Movies(String originalTitle, String overview, Float voteAverage, String posterPath, String backdropPath, String releaseDate) {
         mOriginalTitle = originalTitle;
         mOverview = overview;
         mVoteAverage = voteAverage;

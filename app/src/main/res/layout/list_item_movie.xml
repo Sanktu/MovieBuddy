@@ -8,12 +8,12 @@
         android:layout_height="wrap_content"
         android:src="@drawable/poster"/>
 
-    <TextView
-        android:id="@+id/list_item_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Interstellar"
-        android:textStyle="bold" />
+    <!--<TextView-->
+        <!--android:id="@+id/list_item_name"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:text="Interstellar"-->
+        <!--android:textStyle="bold" />-->
 
 </LinearLayout>

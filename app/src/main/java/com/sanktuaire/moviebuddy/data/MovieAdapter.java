@@ -2,6 +2,7 @@ package com.sanktuaire.moviebuddy.data;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
  */
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
+    private static final String TAG = MovieAdapter.class.getSimpleName();
     private ArrayList<Movies>   mMovies;
     private Context             mContext;
 
@@ -40,8 +42,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(MovieAdapter.ViewHolder holder, int position) {
         Movies movie = mMovies.get(position);
-        Picasso.with(mContext).load(movie.getPosterPath()).into(holder.img_movie);
-        holder.tv_movie.setText(movie.getOriginalTitle());
+        Picasso.with(mContext).load(movie.getPoster_path()).into(holder.img_movie);
+//        holder.tv_movie.setText(movie.getOriginal_title());
     }
 
     @Override
@@ -55,12 +57,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-        private TextView tv_movie;
+//        private TextView tv_movie;
         private ImageView img_movie;
         public ViewHolder(View view) {
             super(view);
 
-            tv_movie = (TextView)view.findViewById(R.id.list_item_name);
+//            tv_movie = (TextView)view.findViewById(R.id.list_item_name);
             img_movie = (ImageView) view.findViewById(R.id.list_item_image);
         }
     }

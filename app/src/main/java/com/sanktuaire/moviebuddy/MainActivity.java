@@ -9,9 +9,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.google.gson.Gson;
 import com.sanktuaire.moviebuddy.data.MovieAdapter;
 import com.sanktuaire.moviebuddy.data.Movies;
 import com.sanktuaire.moviebuddy.utils.NetworkUtils;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -33,9 +38,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 4);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 5);
         mRecyclerView.setLayoutManager(layoutManager);
         mMovieAdapter = new MovieAdapter(this);
+        mRecyclerView.setAdapter(mMovieAdapter);
 
         loadMovies();
     }
@@ -47,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
     public class FetchTMDBTask extends AsyncTask<String, Void, ArrayList<Movies>> {
 
         private final String TAG = FetchTMDBTask.class.getSimpleName();
+        private ArrayList<Movies>   movies = new ArrayList<>();
+
 
         @Override
         protected void onPreExecute() {
@@ -57,8 +65,20 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected ArrayList<Movies> doInBackground(String... params) {
             String jsonResults = NetworkUtils.doTmdbQuery(params[0]);
-            Log.v(TAG, jsonResults);
-            return null;
+            JSONObject jsonObj;
+            try {
+                jsonObj = new JSONObject(jsonResults);
+                JSONArray pop = jsonObj.getJSONArray("results");
+                for (int i = 0; i < pop.length(); i++) {
+                    Gson gson = new Gson();
+                    Movies movie = gson.fromJson(pop.getJSONObject(i).toString(), Movies.class);
+                    movies.add(movie);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return movies;
         }
 
         @Override

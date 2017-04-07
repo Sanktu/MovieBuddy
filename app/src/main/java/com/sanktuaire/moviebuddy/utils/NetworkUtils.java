@@ -2,17 +2,12 @@ package com.sanktuaire.moviebuddy.utils;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.sanktuaire.moviebuddy.BuildConfig;
-import com.sanktuaire.moviebuddy.data.MovieAdapter;
-import com.sanktuaire.moviebuddy.data.Movies;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -29,7 +24,7 @@ public class NetworkUtils {
 
 
 
-    private static URL buildUrlMostPopular() {
+    public static URL buildUrlMostPopular() {
         Uri builtUri = Uri.parse(TMDB_BASE_URL).buildUpon()
                 .appendPath(API_VERSION)
                 .appendPath("movie")
@@ -49,7 +44,7 @@ public class NetworkUtils {
         return url;
     }
 
-    private static URL buildUrlTopRated() {
+    public static URL buildUrlTopRated() {
         Uri builtUri = Uri.parse(TMDB_BASE_URL).buildUpon()
                 .appendPath(API_VERSION)
                 .appendPath("movie")
@@ -80,10 +75,12 @@ public class NetworkUtils {
 
         try {
             Response response = client.newCall(request).execute();
+            //Log.e(TAG, response.body().string());
             return response.body().string();
         }catch (Exception e){
             e.printStackTrace();
         }
+        Log.e(TAG, "NOPE! NO RESPONSE!");
         return null;
     }
 

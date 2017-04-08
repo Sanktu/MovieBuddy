@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.sanktuaire.moviebuddy.data.MovieAdapter;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieClickListener{
 
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar mProgressBar;
     private ArrayList<Movies>   movies;
     private MovieAdapter        mMovieAdapter;
+    private Toast               mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,14 +42,24 @@ public class MainActivity extends AppCompatActivity {
 
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 5);
         mRecyclerView.setLayoutManager(layoutManager);
-        mMovieAdapter = new MovieAdapter(this);
+        mMovieAdapter = new MovieAdapter(this, this);
         mRecyclerView.setAdapter(mMovieAdapter);
 
         loadMovies();
     }
 
+    @Override
+    public void onMovieClick(int clickedItem) {
+        if (mToast != null) {mToast.cancel();}
+        mToast = Toast.makeText(this, movies.get(clickedItem).getOriginal_title(), Toast.LENGTH_SHORT);
+        mToast.show();
+    }
+
     private void loadMovies() {
         new FetchTMDBTask().execute("popular");
+    }
+    private void updateMovies(ArrayList<Movies> movies) {
+        this.movies = movies;
     }
 
     public class FetchTMDBTask extends AsyncTask<String, Void, ArrayList<Movies>> {
@@ -88,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
             if (movies != null) {
                 mRecyclerView.setVisibility(View.VISIBLE);
                 mMovieAdapter.setMovieData(movies);
+                updateMovies(movies);
             } else {
                 //showErrorMessage();
             }

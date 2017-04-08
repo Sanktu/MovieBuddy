@@ -20,12 +20,18 @@ import java.util.ArrayList;
  */
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
-    private static final String TAG = MovieAdapter.class.getSimpleName();
-    private ArrayList<Movies>   mMovies;
-    private Context             mContext;
+    private static final String         TAG = MovieAdapter.class.getSimpleName();
+    private ArrayList<Movies>           mMovies;
+    private Context                     mContext;
+    final private MovieClickListener    mOnClickListener;
 
-    public MovieAdapter(MainActivity mainActivity) {
+    public interface MovieClickListener {
+        void onMovieClick(int clickIndex);
+    }
+
+    public MovieAdapter(MainActivity mainActivity, MovieClickListener listener) {
         mContext = mainActivity.getApplicationContext();
+        mOnClickListener = listener;
     }
 
 //    public MovieAdapter(Context context, ArrayList<Movies> movies) {
@@ -56,14 +62,20 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 //        private TextView tv_movie;
         private ImageView img_movie;
         public ViewHolder(View view) {
             super(view);
 
-//            tv_movie = (TextView)view.findViewById(R.id.list_item_name);
             img_movie = (ImageView) view.findViewById(R.id.list_item_image);
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int clickedPosition = getAdapterPosition();
+            mOnClickListener.onMovieClick(clickedPosition);
         }
     }
 }

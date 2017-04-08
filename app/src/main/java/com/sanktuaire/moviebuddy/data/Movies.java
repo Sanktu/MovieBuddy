@@ -6,15 +6,17 @@ package com.sanktuaire.moviebuddy.data;
 
 public class Movies {
     private String  original_title;
+    private String  title;
     private String  overview;
     private Float   vote_average;
     private String  poster_path;
     private String  backdrop_path;
     private String  release_date;
 
-    public Movies(String originalTitle, String overview, Float voteAverage, String posterPath, String backdropPath, String releaseDate) {
+    public Movies(String originalTitle, String title, String overview, Float voteAverage, String posterPath, String backdropPath, String releaseDate) {
         original_title = originalTitle;
         this.overview = overview;
+        this.title = title;
         vote_average = voteAverage;
         poster_path = posterPath;
         backdrop_path = backdropPath;
@@ -67,5 +69,13 @@ public class Movies {
 
     public void setRelease_date(String release_date) {
         this.release_date = release_date;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

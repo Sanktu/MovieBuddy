@@ -24,6 +24,29 @@ public class NetworkUtils {
 
 
 
+    public static URL buildUrl(String requestType) {
+        Uri.Builder buildUri = Uri.parse(TMDB_BASE_URL).buildUpon()
+                .appendPath(API_VERSION)
+                .appendPath("movie");
+        if (requestType.equals("popular"))
+                buildUri.appendPath("popular");
+        else
+            buildUri.appendPath("top_rated");
+        buildUri.appendQueryParameter("api_key", BuildConfig.TMDB_API_KEY);
+        Uri builtUri = buildUri.build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        Log.v(NetworkUtils.class.getSimpleName(), "Built URI " + url);
+
+        return url;
+    }
+
     public static URL buildUrlMostPopular() {
         Uri builtUri = Uri.parse(TMDB_BASE_URL).buildUpon()
                 .appendPath(API_VERSION)
@@ -67,10 +90,7 @@ public class NetworkUtils {
     public static String doTmdbQuery(String requestType) {
         OkHttpClient client = new OkHttpClient();
         Request.Builder builder = new Request.Builder();
-        if (requestType.equals("popular"))
-            builder.url(buildUrlMostPopular());
-        else
-            builder.url(buildUrlTopRated());
+        builder.url(buildUrl(requestType));
         Request request = builder.build();
 
         try {

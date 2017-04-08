@@ -1,6 +1,7 @@
 package com.sanktuaire.moviebuddy.data;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -48,7 +49,17 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(MovieAdapter.ViewHolder holder, int position) {
         Movies movie = mMovies.get(position);
-        Picasso.with(mContext).load(movie.getPoster_path()).into(holder.img_movie);
+        int dpi = mContext.getResources().getDisplayMetrics().densityDpi;
+        Uri.Builder uri = new Uri.Builder();
+        uri.scheme("http")
+                .authority("image.tmdb.org")
+                .appendPath("t")
+                .appendPath("p");
+        if (dpi <= 320)
+            uri.appendPath("w185");
+        else
+            uri.appendPath("w342");
+        Picasso.with(mContext).load(uri.build().toString() + movie.getPoster_path()).into(holder.img_movie);
 //        holder.tv_movie.setText(movie.getOriginal_title());
     }
 

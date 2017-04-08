@@ -24,7 +24,7 @@ public class NetworkUtils {
 
 
 
-    public static URL buildUrl(String requestType) {
+    public static URL buildUrl(String requestType, String page) {
         Uri.Builder buildUri = Uri.parse(TMDB_BASE_URL).buildUpon()
                 .appendPath(API_VERSION)
                 .appendPath("movie");
@@ -32,7 +32,8 @@ public class NetworkUtils {
                 buildUri.appendPath("popular");
         else
             buildUri.appendPath("top_rated");
-        buildUri.appendQueryParameter("api_key", BuildConfig.TMDB_API_KEY);
+        buildUri.appendQueryParameter("api_key", BuildConfig.TMDB_API_KEY)
+        .appendQueryParameter("page", page);
         Uri builtUri = buildUri.build();
 
         URL url = null;
@@ -47,50 +48,12 @@ public class NetworkUtils {
         return url;
     }
 
-    public static URL buildUrlMostPopular() {
-        Uri builtUri = Uri.parse(TMDB_BASE_URL).buildUpon()
-                .appendPath(API_VERSION)
-                .appendPath("movie")
-                .appendPath("popular")
-                .appendQueryParameter("api_key", BuildConfig.TMDB_API_KEY)
-                .build();
 
-        URL url = null;
-        try {
-            url = new URL(builtUri.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
 
-        Log.v(NetworkUtils.class.getSimpleName(), "Built URI " + url);
-
-        return url;
-    }
-
-    public static URL buildUrlTopRated() {
-        Uri builtUri = Uri.parse(TMDB_BASE_URL).buildUpon()
-                .appendPath(API_VERSION)
-                .appendPath("movie")
-                .appendPath("top_rated")
-                .appendQueryParameter("api_key", BuildConfig.TMDB_API_KEY)
-                .build();
-
-        URL url = null;
-        try {
-            url = new URL(builtUri.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        Log.v(NetworkUtils.class.getSimpleName(), "Built URI " + url);
-
-        return url;
-    }
-
-    public static String doTmdbQuery(String requestType) {
+    public static String doTmdbQuery(String requestType, String page) {
         OkHttpClient client = new OkHttpClient();
         Request.Builder builder = new Request.Builder();
-        builder.url(buildUrl(requestType));
+        builder.url(buildUrl(requestType, page));
         Request request = builder.build();
 
         try {

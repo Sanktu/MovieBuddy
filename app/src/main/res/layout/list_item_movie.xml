@@ -6,6 +6,8 @@
         android:id="@+id/list_item_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:scaleType="fitXY"
+        android:cropToPadding="true"
         android:src="@drawable/poster"/>
 
     <!--<TextView-->

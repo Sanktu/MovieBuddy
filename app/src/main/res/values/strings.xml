@@ -2,4 +2,6 @@
     <string name="app_name">MovieBuddy</string>
     <string name="most_popular">Most Popular</string>
     <string name="top_rated">Top Rated</string>
+    <string name="check_internet">Please check your Internet connectivity!</string>
+    <string name="connectivity_problem">Problem with connectivity</string>
 </resources>

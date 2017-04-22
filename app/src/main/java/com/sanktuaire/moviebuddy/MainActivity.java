@@ -1,14 +1,15 @@
 package com.sanktuaire.moviebuddy;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,9 +41,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     ProgressBar mProgressBar;
     private ArrayList<Movies>   movies;
     private MovieAdapter        mMovieAdapter;
-    private Toast               mToast;
     private Menu                mMenu;
     private boolean             mPopular;
+    public static final int     nbPages = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,33 +65,35 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mRecyclerView.setAdapter(mMovieAdapter);
         setPopular(true);
 
-        loadMovies();
+        // If Data already fetched, no need to do it again when we rotate or recreate activity
+        if (savedInstanceState != null) {
+            movies = savedInstanceState.getParcelableArrayList(Intent.EXTRA_LOCAL_ONLY);
+            mMovieAdapter.setMovieData(movies);
+            mMovieAdapter.notifyDataSetChanged();
+        } else
+            loadMovies();
     }
 
     @Override
     public void onMovieClick(int clickedItem) {
-        if (mToast != null) {mToast.cancel();}
-        mToast = Toast.makeText(this, movies.get(clickedItem).getTitle(), Toast.LENGTH_SHORT);
-        mToast.show();
         Intent intent = new Intent(this, DetailsActivity.class);
         // Verify that the intent will resolve to an activity
         if (intent.resolveActivity(getPackageManager()) != null) {
-            String[] mov = {movies.get(clickedItem).getTitle(),
-                    movies.get(clickedItem).getOverview(),
-                    movies.get(clickedItem).getPoster_path(),
-                    movies.get(clickedItem).getBackdrop_path(),
-                    movies.get(clickedItem).getRelease_date(),
-                    movies.get(clickedItem).getVote_average().toString()};
-            intent.putExtra(Intent.EXTRA_TEXT, mov);
+            intent.putExtra(Intent.EXTRA_TEXT, movies.get(clickedItem));
             startActivity(intent);
         }
     }
 
     private void loadMovies() {
+        if (!isOnline()) {
+            Toast.makeText(this, R.string.check_internet, Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (isPopular())
             new FetchTMDBTask().execute("popular");
         else
             new FetchTMDBTask().execute("toprated");
+//        Toast.makeText(this, "LOADED FROM INTERNET", Toast.LENGTH_SHORT).show();
     }
     private void updateMovies(ArrayList<Movies> movies) {
         this.movies = movies;
@@ -110,14 +114,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
 
         if (id == idpop && !isPopular()) {
-            Toast.makeText(this, "DO MOST POPULAR!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "DO MOST POPULAR!", Toast.LENGTH_SHORT).show();
             setPopular(true);
             mMenu.findItem(R.id.most_popular_menu).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             mMenu.findItem(R.id.top_rated).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
             loadMovies();
         }
         if (id == idrate && isPopular()) {
-            Toast.makeText(this, "DO TOP RATED!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "DO TOP RATED!", Toast.LENGTH_SHORT).show();
             setPopular(false);
             mMenu.findItem(R.id.most_popular_menu).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
             mMenu.findItem(R.id.top_rated).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -150,7 +154,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         @Override
         protected ArrayList<Movies> doInBackground(String... params) {
-            int nbPages = 4;
             String[] jsonResults = new String[nbPages];
             JSONObject jsonObj[] = new JSONObject[nbPages];
             JSONArray pop[] = new JSONArray[nbPages];
@@ -158,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             for (int i = 0; i < nbPages; i++) {
                 jsonResults[i] = NetworkUtils.doTmdbQuery(params[0], String.valueOf(i + 1));
             }
+            if (jsonResults[0] == null) {return null;}
             try {
                 for (int i = 0; i < nbPages; i++) {
                     jsonObj[i] = new JSONObject(jsonResults[i]);
@@ -183,8 +187,26 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 mMovieAdapter.setMovieData(movies);
                 updateMovies(movies);
             } else {
-                //showErrorMessage();
+                showErrorMessage();
             }
         }
+    }
+
+    private void showErrorMessage() {
+        mProgressBar.setVisibility(View.INVISIBLE);
+        Toast.makeText(this, R.string.connectivity_problem, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(Intent.EXTRA_LOCAL_ONLY, movies);
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }

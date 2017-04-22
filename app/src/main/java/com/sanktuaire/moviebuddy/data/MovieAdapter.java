@@ -3,18 +3,17 @@ package com.sanktuaire.moviebuddy.data;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.sanktuaire.moviebuddy.MainActivity;
 import com.sanktuaire.moviebuddy.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Sanktuaire on 2017-04-07.
@@ -22,7 +21,7 @@ import java.util.ArrayList;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
     private static final String         TAG = MovieAdapter.class.getSimpleName();
-    private ArrayList<Movies>           mMovies;
+    private List<Movies>                mMovies;
     private Context                     mContext;
     final private MovieClickListener    mOnClickListener;
 
@@ -68,7 +67,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         return (mMovies == null) ? 0 : mMovies.size();
     }
 
-    public void setMovieData(ArrayList<Movies> movies) {
+    public void setMovieData(List<Movies> movies) {
         mMovies = movies;
         notifyDataSetChanged();
     }

@@ -11,8 +11,6 @@ import android.widget.ImageView;
 import com.sanktuaire.moviebuddy.MainActivity;
 import com.sanktuaire.moviebuddy.R;
 import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,7 +18,6 @@ import java.util.List;
  */
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
-    private static final String         TAG = MovieAdapter.class.getSimpleName();
     private List<Movies>                mMovies;
     private Context                     mContext;
     final private MovieClickListener    mOnClickListener;
@@ -33,11 +30,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         mContext = mainActivity.getApplicationContext();
         mOnClickListener = listener;
     }
-
-//    public MovieAdapter(Context context, ArrayList<Movies> movies) {
-//        mMovies = movies;
-//        mContext = context;
-//    }
 
     @Override
     public MovieAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -59,7 +51,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         else
             uri.appendPath("w342");
         Picasso.with(mContext).load(uri.build().toString() + movie.getPoster_path()).into(holder.img_movie);
-//        holder.tv_movie.setText(movie.getOriginal_title());
     }
 
     @Override
@@ -73,7 +64,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-//        private TextView tv_movie;
         private ImageView img_movie;
         public ViewHolder(View view) {
             super(view);

@@ -1,10 +1,7 @@
 package com.sanktuaire.moviebuddy.data;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import java.io.Serializable;
 
 /**
  * Created by Sanktuaire on 2017-04-07.

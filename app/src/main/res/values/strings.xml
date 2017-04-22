@@ -4,4 +4,8 @@
     <string name="top_rated">Top Rated</string>
     <string name="check_internet">Please check your Internet connectivity!</string>
     <string name="connectivity_problem">Problem with connectivity</string>
+    <string name="interstellar">Interstellar</string>
+    <string name="release_date">2012</string>
+    <string name="overview">Dans un futur proche, face à une Terre exsangue, un groupe d\'explorateurs utilise un vaisseau interstellaire pour franchir un trou de ver permettant de parcourir des distances jusque-là infranchissables. Leur but : trouver un nouveau foyer pour l\'humanité.</string>
+    <string name="movie_poster">Movie Poster</string>
 </resources>

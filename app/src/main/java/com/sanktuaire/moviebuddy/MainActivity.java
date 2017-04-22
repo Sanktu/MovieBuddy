@@ -27,14 +27,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieClickListener{
 
-    private static final String TAG = MainActivity.class.getSimpleName();
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
     @BindView(R.id.progress_bar)
@@ -93,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             new FetchTMDBTask().execute("popular");
         else
             new FetchTMDBTask().execute("toprated");
-//        Toast.makeText(this, "LOADED FROM INTERNET", Toast.LENGTH_SHORT).show();
     }
     private void updateMovies(ArrayList<Movies> movies) {
         this.movies = movies;
@@ -114,14 +111,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
 
         if (id == idpop && !isPopular()) {
-            //Toast.makeText(this, "DO MOST POPULAR!", Toast.LENGTH_SHORT).show();
             setPopular(true);
             mMenu.findItem(R.id.most_popular_menu).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             mMenu.findItem(R.id.top_rated).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
             loadMovies();
         }
         if (id == idrate && isPopular()) {
-            //Toast.makeText(this, "DO TOP RATED!", Toast.LENGTH_SHORT).show();
             setPopular(false);
             mMenu.findItem(R.id.most_popular_menu).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
             mMenu.findItem(R.id.top_rated).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -141,7 +136,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     public class FetchTMDBTask extends AsyncTask<String, Void, ArrayList<Movies>> {
 
-        private final String TAG = FetchTMDBTask.class.getSimpleName();
         private ArrayList<Movies>   movies = new ArrayList<>();
 
 

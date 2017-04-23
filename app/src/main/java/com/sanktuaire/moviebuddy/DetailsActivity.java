@@ -41,31 +41,37 @@ public class DetailsActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         int dpi = getResources().getDisplayMetrics().densityDpi;
+        final Movies mov;
 
         Intent intent = getIntent();
-        final Movies mov = intent.getParcelableExtra(Intent.EXTRA_TEXT);
-        mTitleDetails.setText(mov.getTitle());
-        mReleaseDateDetails.setText(mov.getRelease_date().split("-")[0]);
-        mOverviewDetails.setText(mov.getOverview());
-        mAppCompatRatingBar.setRating(mov.getVote_average()/2);
-        Uri.Builder uri = new Uri.Builder();
-        uri.scheme("http")
-                .authority("image.tmdb.org")
-                .appendPath("t")
-                .appendPath("p");
-        if (dpi <= 320)
-            uri.appendPath("w185");
+        if (intent == null || !intent.hasExtra(Intent.EXTRA_TEXT))
+            mTitleDetails.setText(R.string.intent_error);
         else
-            uri.appendPath("w342");
-        Picasso.with(this).load(uri.build().toString() + mov.getPoster_path())
-                .into(mPosterDetails);
+            {
+                mov = intent.getParcelableExtra(Intent.EXTRA_TEXT);
+                mTitleDetails.setText(mov.getTitle());
+                mReleaseDateDetails.setText(mov.getRelease_date().split("-")[0]);
+                mOverviewDetails.setText(mov.getOverview());
+                mAppCompatRatingBar.setRating(mov.getVote_average() / 2);
+                Uri.Builder uri = new Uri.Builder();
+                uri.scheme("http")
+                        .authority("image.tmdb.org")
+                        .appendPath("t")
+                        .appendPath("p");
+                if (dpi <= 320)
+                    uri.appendPath("w185");
+                else
+                    uri.appendPath("w342");
+                Picasso.with(this).load(uri.build().toString() + mov.getPoster_path())
+                        .into(mPosterDetails);
 
-        mAppCompatRatingBar.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Toast.makeText(DetailsActivity.this, String.valueOf(mov.getVote_average()), Toast.LENGTH_SHORT).show();
-                return false;
+                mAppCompatRatingBar.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        Toast.makeText(DetailsActivity.this, String.valueOf(mov.getVote_average()), Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                });
             }
-        });
     }
 }

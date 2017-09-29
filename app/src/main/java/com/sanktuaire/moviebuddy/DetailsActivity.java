@@ -39,8 +39,6 @@ public class DetailsActivity extends AppCompatActivity {
     TextView mTitleDetails;
     @BindView(R.id.release_date_details)
     TextView mReleaseDateDetails;
-    @BindView(R.id.overview_details)
-    TextView mOverviewDetails;
     @BindView(R.id.appCompatRatingBar)
     AppCompatRatingBar mAppCompatRatingBar;
     @BindView(R.id.constraint_layout)

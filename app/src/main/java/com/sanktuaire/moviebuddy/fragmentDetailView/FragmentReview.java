@@ -72,6 +72,10 @@ public class FragmentReview extends Fragment implements ReviewAdapter.ReviewClic
 
     @Override
     public void onReviewClick(int clickIndex, View v) {
+        if (mRecyclerView.getChildAdapterPosition(v) == mRecyclerView.getAdapter().getItemCount() - 1) {
+            Log.d("======> ", "LASTO LASTO LASTO");
+            return;
+        }
         TextView tvContent = (TextView) v.findViewById(R.id.tv_review_content);
         if (tvContent.getTag() == Boolean.TRUE) {
             tvContent.setText(mReviews.get(clickIndex).getExcerpt());

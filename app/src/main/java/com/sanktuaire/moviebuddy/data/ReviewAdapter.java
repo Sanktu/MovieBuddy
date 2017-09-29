@@ -1,6 +1,7 @@
 package com.sanktuaire.moviebuddy.data;
 
 import android.content.Context;
+import android.support.transition.TransitionManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -46,6 +47,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Review review = mReviews.get(position);
 
+
         tvAuthor.setText(review.getAuthor());
         if (position == 0) {
             tvContent.setText(review.getContent());
@@ -53,11 +55,13 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
             tvContent.setTag(Boolean.TRUE);
         }
         else {
-            tvContent.setText(review.getExcerpt());
+            tvContent.setText(review.getContent());
             tvContent.setTag(Boolean.FALSE);
         }
 
     }
+
+
 
     @Override
     public int getItemCount() {

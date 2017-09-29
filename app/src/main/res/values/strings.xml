@@ -9,4 +9,8 @@
     <string name="overview">Dans un futur proche, face à une Terre exsangue, un groupe d\'explorateurs utilise un vaisseau interstellaire pour franchir un trou de ver permettant de parcourir des distances jusque-là infranchissables. Leur but : trouver un nouveau foyer pour l\'humanité.</string>
     <string name="movie_poster">Movie Poster</string>
     <string name="intent_error">Intent Error</string>
+    <string name="overview_tab">Overview</string>
+    <string name="review_tab">Reviews</string>
+    <string name="trailer_tab">Trailers</string>
+    <string name="hd">HD</string>
 </resources>

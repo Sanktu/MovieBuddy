@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         if (isPopular())
             new FetchTMDBTask().execute("popular");
         else
-            new FetchTMDBTask().execute("toprated");
+            new FetchTMDBTask().execute("top_rated");
     }
     private void updateMovies(ArrayList<Movies> movies) {
         this.movies = movies;

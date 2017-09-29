@@ -1,9 +1,16 @@
 package com.sanktuaire.moviebuddy;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatRatingBar;
 import android.view.MotionEvent;
@@ -13,6 +20,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sanktuaire.moviebuddy.data.Movies;
+import com.sanktuaire.moviebuddy.fragmentDetailView.FragmentOverview;
+import com.sanktuaire.moviebuddy.fragmentDetailView.FragmentReview;
+import com.sanktuaire.moviebuddy.fragmentDetailView.FragmentTrailer;
+import com.sanktuaire.moviebuddy.fragmentDetailView.SectionsPageAdapter;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
@@ -20,6 +31,8 @@ import butterknife.ButterKnife;
 
 public class DetailsActivity extends AppCompatActivity {
 
+    public static final String OVERVIEW = "overview";
+    public static final String MOVIE_ID = "movieID";
     @BindView(R.id.poster_details)
     ImageView mPosterDetails;
     @BindView(R.id.title_details)
@@ -32,6 +45,13 @@ public class DetailsActivity extends AppCompatActivity {
     AppCompatRatingBar mAppCompatRatingBar;
     @BindView(R.id.constraint_layout)
     ConstraintLayout mConstraintLayout;
+    @BindView(R.id.tabLayout)
+    TabLayout mTabLayout;
+    @BindView(R.id.pager)
+    ViewPager mViewPager;
+
+    private SectionsPageAdapter mSectionsAdapter;
+
 
 
     @Override
@@ -51,7 +71,7 @@ public class DetailsActivity extends AppCompatActivity {
                 mov = intent.getParcelableExtra(Intent.EXTRA_TEXT);
                 mTitleDetails.setText(mov.getTitle());
                 mReleaseDateDetails.setText(mov.getRelease_date().split("-")[0]);
-                mOverviewDetails.setText(mov.getOverview());
+                //mOverviewDetails.setText(mov.getOverview());
                 mAppCompatRatingBar.setRating(mov.getVote_average() / 2);
                 Uri.Builder uri = new Uri.Builder();
                 uri.scheme("http")
@@ -72,6 +92,31 @@ public class DetailsActivity extends AppCompatActivity {
                         return false;
                     }
                 });
+                mSectionsAdapter = new SectionsPageAdapter(getSupportFragmentManager());
+                setupViewPager(mViewPager, mSectionsAdapter, mov);
+                mTabLayout.setupWithViewPager(mViewPager);
             }
     }
+
+    private void setupViewPager(ViewPager viewPager, SectionsPageAdapter adapter, Movies movie) {
+        Bundle bundle = new Bundle();
+        bundle.putString(OVERVIEW, movie.getOverview());
+        bundle.putString(MOVIE_ID, movie.getId());
+
+        FragmentOverview fragmentOverview = new FragmentOverview();
+        FragmentReview fragmentReview = new FragmentReview();
+        FragmentTrailer fragmentTrailer = new FragmentTrailer();
+
+        fragmentOverview.setArguments(bundle);
+        fragmentReview.setArguments(bundle);
+        fragmentTrailer.setArguments(bundle);
+
+        Resources res = getResources();
+        adapter.addFragment(fragmentOverview, res.getString(R.string.overview_tab));
+        adapter.addFragment(fragmentReview, res.getString(R.string.review_tab));
+        adapter.addFragment(fragmentTrailer, res.getString(R.string.trailer_tab));
+
+        viewPager.setAdapter(adapter);
+    }
+
 }

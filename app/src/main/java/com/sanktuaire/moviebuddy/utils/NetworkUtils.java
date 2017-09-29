@@ -26,13 +26,13 @@ public class NetworkUtils {
     public static URL buildUrl(String requestType, String page) {
         Uri.Builder buildUri = Uri.parse(TMDB_BASE_URL).buildUpon()
                 .appendPath(API_VERSION)
-                .appendPath("movie");
-        if (requestType.equals("popular"))
-                buildUri.appendPath("popular");
+                .appendPath("movie")
+                .appendPath(requestType);
+        if (!requestType.equals("popular") && !requestType.equals("top_rated"))
+            buildUri.appendPath(page);
         else
-            buildUri.appendPath("top_rated");
-        buildUri.appendQueryParameter("api_key", BuildConfig.TMDB_API_KEY)
-        .appendQueryParameter("page", page);
+            buildUri.appendQueryParameter("page", page);
+        buildUri.appendQueryParameter("api_key", BuildConfig.TMDB_API_KEY);
         Uri builtUri = buildUri.build();
 
         URL url = null;

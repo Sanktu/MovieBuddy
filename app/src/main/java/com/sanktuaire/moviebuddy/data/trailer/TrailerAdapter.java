@@ -1,4 +1,4 @@
-package com.sanktuaire.moviebuddy.data;
+package com.sanktuaire.moviebuddy.data.trailer;
 
 import android.content.Context;
 import android.content.Intent;

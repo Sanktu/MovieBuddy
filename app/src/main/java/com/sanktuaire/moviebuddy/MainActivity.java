@@ -17,8 +17,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.sanktuaire.moviebuddy.data.MovieAdapter;
-import com.sanktuaire.moviebuddy.data.Movies;
+import com.sanktuaire.moviebuddy.data.movie.MovieAdapter;
+import com.sanktuaire.moviebuddy.data.movie.Movies;
 import com.sanktuaire.moviebuddy.utils.ItemOffsetDecoration;
 import com.sanktuaire.moviebuddy.utils.NetworkUtils;
 
@@ -77,7 +77,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         Intent intent = new Intent(this, DetailsActivity.class);
         // Verify that the intent will resolve to an activity
         if (intent.resolveActivity(getPackageManager()) != null) {
-            intent.putExtra(Intent.EXTRA_TEXT, movies.get(clickedItem));
+            Movies movie = movies.get(clickedItem);
+            if (movie.isFav(this))
+                movie.setFav(true);
+            intent.putExtra(Intent.EXTRA_TEXT, movie);
+            //intent.putParcelableArrayListExtra(Intent.EXTRA_LOCAL_ONLY, movies);
             startActivity(intent);
         }
     }
@@ -92,6 +96,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         else
             new FetchTMDBTask().execute("top_rated");
     }
+
+    private void loadFavMovies() {
+        
+        mRecyclerView.setVisibility(View.VISIBLE);
+        mMovieAdapter.setMovieData(movies);
+        updateMovies(movies);
+    }
+
+
     private void updateMovies(ArrayList<Movies> movies) {
         this.movies = movies;
     }
@@ -108,19 +121,26 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         int id = item.getItemId();
         int idpop = R.id.most_popular_menu;
         int idrate = R.id.top_rated;
+        int idfav = R.id.favorite;
 
 
         if (id == idpop && !isPopular()) {
             setPopular(true);
             mMenu.findItem(R.id.most_popular_menu).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             mMenu.findItem(R.id.top_rated).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            mMenu.findItem(idfav).setIcon(android.R.drawable.btn_star_big_off);
             loadMovies();
         }
         if (id == idrate && isPopular()) {
             setPopular(false);
             mMenu.findItem(R.id.most_popular_menu).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
             mMenu.findItem(R.id.top_rated).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            mMenu.findItem(idfav).setIcon(android.R.drawable.btn_star_big_off);
             loadMovies();
+        }
+        if (id == idfav) {
+            mMenu.findItem(idfav).setIcon(android.R.drawable.btn_star_big_on);
+            loadFavMovies();
         }
 
         return super.onOptionsItemSelected(item);
@@ -202,5 +222,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        movies = savedInstanceState.getParcelableArrayList(Intent.EXTRA_LOCAL_ONLY);
+        mMovieAdapter.setMovieData(movies);
+        mMovieAdapter.notifyDataSetChanged();
     }
 }

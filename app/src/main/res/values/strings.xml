@@ -13,4 +13,5 @@
     <string name="review_tab">Reviews</string>
     <string name="trailer_tab">Trailers</string>
     <string name="hd">HD</string>
+    <string name="favorite">Favorite</string>
 </resources>

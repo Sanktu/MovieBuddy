@@ -1,6 +1,8 @@
-package com.sanktuaire.moviebuddy.data;
+package com.sanktuaire.moviebuddy.data.movie;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,7 +21,7 @@ import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
     private List<Movies>                mMovies;
-    private Context                     mContext;
+    private static Context                     mContext;
     final private MovieClickListener    mOnClickListener;
 
     public interface MovieClickListener {

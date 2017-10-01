@@ -1,15 +1,15 @@
 package com.sanktuaire.moviebuddy.fragmentDetailView;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +17,20 @@ import android.view.ViewGroup;
 import com.google.gson.Gson;
 import com.sanktuaire.moviebuddy.DetailsActivity;
 import com.sanktuaire.moviebuddy.R;
-import com.sanktuaire.moviebuddy.data.Trailer;
-import com.sanktuaire.moviebuddy.data.TrailerAdapter;
+import com.sanktuaire.moviebuddy.data.movie.MovieAdapter;
+import com.sanktuaire.moviebuddy.data.movie.MovieContract;
+import com.sanktuaire.moviebuddy.data.movie.Movies;
+import com.sanktuaire.moviebuddy.data.review.Review;
+import com.sanktuaire.moviebuddy.data.review.ReviewContract;
+import com.sanktuaire.moviebuddy.data.trailer.Trailer;
+import com.sanktuaire.moviebuddy.data.trailer.TrailerAdapter;
+import com.sanktuaire.moviebuddy.data.trailer.TrailerContract;
 import com.sanktuaire.moviebuddy.utils.NetworkUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,13 +46,17 @@ public class FragmentTrailer extends Fragment {
     @BindView(R.id.recycler_view_ft)
     RecyclerView mRecyclerView;
 
-    private ArrayList<Trailer> mTrailers;
-    private TrailerAdapter mTrailerAdapter;
-    private Context mContext;
+    private ArrayList<Trailer>  mTrailers;
+    private TrailerAdapter      mTrailerAdapter;
+    private Context             mContext;
+    private Movies              movie;
+    public FetchTrailTask       mFetchTrailTask;
 
     public FragmentTrailer() {
-
+        mFetchTrailTask = new FetchTrailTask();
+        mTrailerAdapter = new TrailerAdapter(this);
     }
+
 
     @Nullable
     @Override
@@ -57,50 +66,68 @@ public class FragmentTrailer extends Fragment {
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(layoutManager);
-        mTrailerAdapter = new TrailerAdapter(this);
+
         mRecyclerView.setAdapter(mTrailerAdapter);
 
-        Bundle bundle = getArguments();
+        if (savedInstanceState != null)
+            movie = savedInstanceState.getParcelable(Intent.EXTRA_LOCAL_ONLY);
+        else {
+            Bundle bundle = getArguments();
+            movie = bundle.getParcelable(DetailsActivity.MOVIE_BUNDLE);
+        }
 
-        new FetchTrailTask().execute(bundle.getString(DetailsActivity.MOVIE_ID));
+        mTrailerAdapter.setTrailerData(movie.getTrailers());
 
         return rootView;
     }
 
-    private void updateTrailers(ArrayList<Trailer> trailers) {
-        this.mTrailers = trailers;
+    private void updateTrailers(Movies movie) {
+        this.movie = movie;
     }
 
-    class FetchTrailTask extends AsyncTask<String, Void, ArrayList<Trailer>> {
+
+    public class FetchTrailTask extends AsyncTask<String, Void, Movies> {
 
         private ArrayList<Trailer> mTrailers = new ArrayList<>();
         private static final String TRAILERS = "trailers";
 
         @Override
-        protected ArrayList<Trailer> doInBackground(String... params) {
+        protected Movies doInBackground(String... params) {
             String jsonResult = NetworkUtils.doTmdbQuery(params[0], TRAILERS);
             try {
                 JSONObject jsonObj = new JSONObject(jsonResult);
                 JSONArray pop = jsonObj.getJSONArray("youtube");
-                for (int i = 0; i < pop.length(); i++ ) {
+                for (int i = 0; i < pop.length(); i++) {
                     Gson gson = new Gson();
                     Trailer trailer = gson.fromJson(pop.getJSONObject(i).toString(), Trailer.class);
-                    mTrailers.add(trailer);
+                    movie.addTrailer(trailer);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            return mTrailers;
+            return movie;
         }
 
+
         @Override
-        protected void onPostExecute(ArrayList<Trailer> trailers) {
-            super.onPostExecute(trailers);
-            if (trailers != null) {
-                mTrailerAdapter.setTrailerData(trailers);
-                updateTrailers(trailers);
+        protected void onPostExecute(Movies movie) {
+            super.onPostExecute(movie);
+            if (movie.getTrailers() != null) {
+                mTrailerAdapter.setTrailerData(movie.getTrailers());
+                updateTrailers(movie);
             }
         }
     }
+    public void setMovie(Movies movie) {
+        this.movie = movie;
+        this.movie.initializeTrailers();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(Intent.EXTRA_LOCAL_ONLY, movie);
+    }
+
 
 }

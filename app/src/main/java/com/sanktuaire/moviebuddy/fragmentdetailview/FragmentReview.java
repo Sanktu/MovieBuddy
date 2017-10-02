@@ -64,7 +64,8 @@ public class FragmentReview extends Fragment implements ReviewAdapter.ReviewClic
             movie = bundle.getParcelable(DetailsActivity.MOVIE_BUNDLE);
         }
 
-        mReviewAdapter.setReviewsData(movie.getReviews());
+        if (movie != null)
+            mReviewAdapter.setReviewsData(movie.getReviews());
 
         return rootView;
     }

@@ -48,9 +48,7 @@ public class Trailer implements Parcelable {
     }
 
     public boolean isHd() {
-        if (size.equals("HD"))
-            return true;
-        return false;
+        return size.equals("HD");
     }
 
     public void source(String source) {

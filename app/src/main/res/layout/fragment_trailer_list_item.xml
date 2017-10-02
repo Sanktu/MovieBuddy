@@ -15,7 +15,8 @@
         android:layout_marginTop="8dp"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginStart="8dp"/>
+        android:layout_marginStart="8dp"
+        android:contentDescription="@string/play_button_press_to_play_video"/>
 
     <TextView
         android:id="@+id/tv_trailer_name"

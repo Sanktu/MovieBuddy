@@ -174,7 +174,7 @@ public class Movies implements Parcelable {
         dest.writeList(mTrailers);
     }
 
-    public Uri setFavorite(final Context context) throws IOException {
+    public void setFavorite(final Context context) {
 
         ContentResolver cr = context.getContentResolver();
         ContentValues contentValues = new ContentValues();
@@ -208,7 +208,7 @@ public class Movies implements Parcelable {
         Toast.makeText(context, "Favorite " + title, Toast.LENGTH_SHORT).show();
 
         // Insert the content values via a ContentResolver
-        Uri movieInserted =  cr.insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
+        cr.insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
 
         for (Review review : mReviews) {
             ContentValues cv = new ContentValues();
@@ -232,8 +232,6 @@ public class Movies implements Parcelable {
             cr.insert(TrailerContract.TrailerEntry.CONTENT_URI, cv);
         }
         isFavorite = true;
-
-        return movieInserted;
     }
 
     public void removeFavorite(Context context) {
@@ -294,6 +292,7 @@ public class Movies implements Parcelable {
                 new String[]{id},
                 null);
 
+        if (c == null) return false;
         if (c.getCount() != 0) {
             c.close();
             return true;
@@ -321,7 +320,9 @@ public class Movies implements Parcelable {
                             e.printStackTrace();
                         } finally {
                             try {
-                                fos.close();
+                                if (fos != null) {
+                                    fos.close();
+                                }
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -336,7 +337,7 @@ public class Movies implements Parcelable {
             }
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
-                if (placeHolderDrawable != null) {}
+                if(placeHolderDrawable != null) {}
             }
         };
     }

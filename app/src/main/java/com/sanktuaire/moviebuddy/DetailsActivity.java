@@ -33,7 +33,6 @@ import com.sanktuaire.moviebuddy.fragmentdetailview.SectionsPageAdapter;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,9 +62,6 @@ public class DetailsActivity extends AppCompatActivity {
     @BindView(R.id.pager)
     ViewPager mViewPager;
 
-    private SectionsPageAdapter mSectionsAdapter;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,12 +77,12 @@ public class DetailsActivity extends AppCompatActivity {
         if (intent == null || !intent.hasExtra(Intent.EXTRA_TEXT))
             mTitleDetails.setText(R.string.intent_error);
         else
-            {
-                final Movies mov = setupDetailActivity(intent, movie);
-                mSectionsAdapter = new SectionsPageAdapter(getSupportFragmentManager());
-                setupViewPager(mViewPager, mSectionsAdapter, mov);
-                mTabLayout.setupWithViewPager(mViewPager);
-            }
+        {
+            final Movies mov = setupDetailActivity(intent, movie);
+            SectionsPageAdapter sectionsAdapter = new SectionsPageAdapter(getSupportFragmentManager());
+            setupViewPager(mViewPager, sectionsAdapter, mov);
+            mTabLayout.setupWithViewPager(mViewPager);
+        }
     }
 
     @NonNull
@@ -112,11 +108,7 @@ public class DetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (favorite.getTag() == Boolean.FALSE) {
-                    try {
-                        mov.setFavorite(getApplicationContext());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    mov.setFavorite(getApplicationContext());
                     favorite.setImageResource(android.R.drawable.btn_star_big_on);
                     favorite.setTag(Boolean.TRUE);
 
@@ -204,6 +196,7 @@ public class DetailsActivity extends AppCompatActivity {
                 new String[]{movieID},
                 null);
 
+        if (c == null) return null;
         List<Review> reviews = new ArrayList<>();
 
         while (c.moveToNext()) {
@@ -236,6 +229,7 @@ public class DetailsActivity extends AppCompatActivity {
 
         List<Trailer> trailers = new ArrayList<>();
 
+        if (c == null) return null;
         while (c.moveToNext()) {
             String name = c.getString(c.getColumnIndex(TrailerContract.TrailerEntry.COLUMN_NAME));
             String size = c.getString(c.getColumnIndex(TrailerContract.TrailerEntry.COLUMN_SIZE));

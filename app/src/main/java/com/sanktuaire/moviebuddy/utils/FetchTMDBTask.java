@@ -1,7 +1,6 @@
 package com.sanktuaire.moviebuddy.utils;
 
 import android.os.AsyncTask;
-import android.view.View;
 
 import com.google.gson.Gson;
 import com.sanktuaire.moviebuddy.data.movie.Movies;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Sanktuaire on 02/10/2017.
+ *
  */
 
 public class FetchTMDBTask extends AsyncTask<String, Void, ArrayList<Movies>> {

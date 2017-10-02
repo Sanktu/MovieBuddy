@@ -15,4 +15,7 @@
     <string name="hd">HD</string>
     <string name="favorite">Favorite</string>
     <string name="switchfav">Switching to favorite mode.</string>
+    <string name="poster_of_the_movie">Poster of the movie</string>
+    <string name="press_the_star_to_favorite_that_movie">Press the star to favorite that movie</string>
+    <string name="play_button_press_to_play_video">Play button. Press to play video</string>
 </resources>

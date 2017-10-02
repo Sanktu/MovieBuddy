@@ -63,7 +63,8 @@ public class FragmentTrailer extends Fragment {
             movie = bundle.getParcelable(DetailsActivity.MOVIE_BUNDLE);
         }
 
-        mTrailerAdapter.setTrailerData(movie.getTrailers());
+        if (movie != null)
+            mTrailerAdapter.setTrailerData(movie.getTrailers());
 
         return rootView;
     }

@@ -22,7 +22,8 @@
             app:layout_constraintLeft_toRightOf="@+id/poster_details"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@color/colorPrimaryDark"/>
+            app:srcCompat="@color/colorPrimaryDark"
+            android:contentDescription="@string/poster_of_the_movie"/>
 
         <ImageView
             android:id="@+id/poster_details"
@@ -33,6 +34,7 @@
             android:contentDescription="@string/movie_poster"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginLeft="0dp"
+            android:layout_marginStart="0dp"
             android:layout_marginTop="0dp"/>
 
         <TextView
@@ -40,6 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="0dp"
+            android:layout_marginStart="0dp"
             android:layout_marginTop="0dp"
             android:background="@color/colorPrimaryDark"
             android:gravity="center"
@@ -103,6 +106,7 @@
             app:layout_constraintLeft_toRightOf="@+id/poster_details"
             android:layout_marginTop="0dp"
             android:layout_marginLeft="0dp"
+            android:layout_marginStart="0dp"
             app:layout_constraintHorizontal_bias="0.0"
             app:tabTextColor="@android:color/white"
             app:tabSelectedTextColor="@color/colorAccent"
@@ -118,10 +122,11 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:background="@android:color/background_light"
+            android:background="?attr/colorBackgroundFloating"
+            android:contentDescription="@string/press_the_star_to_favorite_that_movie"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="@id/poster_details"
             app:layout_constraintTop_toBottomOf="@id/appCompatRatingBar"
-            app:layout_constraintLeft_toLeftOf="parent"
             app:srcCompat="@android:drawable/btn_star_big_off"/>
 
 

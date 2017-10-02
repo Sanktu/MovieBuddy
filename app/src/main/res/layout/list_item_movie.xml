@@ -8,6 +8,7 @@
         android:layout_height="wrap_content"
         android:scaleType="fitXY"
         android:cropToPadding="true"
-        android:src="@drawable/poster"/>
+        android:src="@drawable/poster"
+        android:contentDescription="@string/movie_poster"/>
 
 </LinearLayout>

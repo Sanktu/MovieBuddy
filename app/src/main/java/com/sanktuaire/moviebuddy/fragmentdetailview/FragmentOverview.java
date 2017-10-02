@@ -1,4 +1,4 @@
-package com.sanktuaire.moviebuddy.fragmentDetailView;
+package com.sanktuaire.moviebuddy.fragmentdetailview;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

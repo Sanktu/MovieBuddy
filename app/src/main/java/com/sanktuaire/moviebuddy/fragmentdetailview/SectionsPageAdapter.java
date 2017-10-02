@@ -1,4 +1,4 @@
-package com.sanktuaire.moviebuddy.fragmentDetailView;
+package com.sanktuaire.moviebuddy.fragmentdetailview;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

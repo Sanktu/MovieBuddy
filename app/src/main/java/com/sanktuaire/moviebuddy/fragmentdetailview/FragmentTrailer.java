@@ -1,6 +1,5 @@
-package com.sanktuaire.moviebuddy.fragmentDetailView;
+package com.sanktuaire.moviebuddy.fragmentdetailview;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;

@@ -22,6 +22,8 @@ import com.google.gson.Gson;
 import com.sanktuaire.moviebuddy.data.movie.MovieAdapter;
 import com.sanktuaire.moviebuddy.data.movie.MovieContract;
 import com.sanktuaire.moviebuddy.data.movie.Movies;
+import com.sanktuaire.moviebuddy.utils.AsyncTaskListener;
+import com.sanktuaire.moviebuddy.utils.FetchTMDBTask;
 import com.sanktuaire.moviebuddy.utils.ItemOffsetDecoration;
 import com.sanktuaire.moviebuddy.utils.NetworkUtils;
 
@@ -109,16 +111,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         switch (mode) {
             case POPULAR:
-                new FetchTMDBTask().execute(POPULAR);
+                new FetchTMDBTask(new FetchMyDataTaskListener()).execute(POPULAR);
+//                new FetchTMDBTask().execute(POPULAR);
                 break;
             case TOP_RATED:
-                new FetchTMDBTask().execute(TOP_RATED);
+                new FetchTMDBTask(new FetchMyDataTaskListener()).execute(TOP_RATED);
+//                new FetchTMDBTask().execute(TOP_RATED);
                 break;
             case FAVORITE:
                 loadFavMovies();
                 break;
             default:
-                new FetchTMDBTask().execute(POPULAR);
+                new FetchTMDBTask(new FetchMyDataTaskListener()).execute(POPULAR);
+//                new FetchTMDBTask().execute(POPULAR);
         }
     }
 
@@ -233,57 +238,79 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mPopular = popular;
     }
 
-    public class FetchTMDBTask extends AsyncTask<String, Void, ArrayList<Movies>> {
-
-        private ArrayList<Movies>   movies = new ArrayList<>();
-
-
+    public class FetchMyDataTaskListener implements AsyncTaskListener<ArrayList<Movies>>
+    {
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+        public void beforeTask() {
             mProgressBar.setVisibility(View.VISIBLE);
             mRecyclerView.setVisibility(View.INVISIBLE);
         }
 
         @Override
-        protected ArrayList<Movies> doInBackground(String... params) {
-            String[] jsonResults = new String[nbPages];
-            JSONObject jsonObj[] = new JSONObject[nbPages];
-            JSONArray pop[] = new JSONArray[nbPages];
-
-            for (int i = 0; i < nbPages; i++) {
-                jsonResults[i] = NetworkUtils.doTmdbQuery(params[0], String.valueOf(i + 1));
-            }
-            if (jsonResults[0] == null) {return null;}
-            try {
-                for (int i = 0; i < nbPages; i++) {
-                    jsonObj[i] = new JSONObject(jsonResults[i]);
-                    pop[i] = jsonObj[i].getJSONArray("results");
-                    for (int j = 0; j < pop[i].length(); j++) {
-                        Gson gson = new Gson();
-                        Movies movie = gson.fromJson(pop[i].getJSONObject(j).toString(), Movies.class);
-                        movies.add(movie);
-                    }
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return movies;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Movies> movies) {
-            super.onPostExecute(movies);
+        public void onTaskComplete(ArrayList<Movies> result) {
             mProgressBar.setVisibility(View.INVISIBLE);
-            if (movies != null) {
+            if (result != null) {
                 mRecyclerView.setVisibility(View.VISIBLE);
-                mMovieAdapter.setMovieData(movies);
+                mMovieAdapter.setMovieData(result);
+                movies = result;
                 updateMovies(movies);
             } else {
                 showErrorMessage();
             }
         }
     }
+
+//    public class FetchTMDBTask extends AsyncTask<String, Void, ArrayList<Movies>> {
+//
+//        private ArrayList<Movies>   movies = new ArrayList<>();
+//
+//
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//            mProgressBar.setVisibility(View.VISIBLE);
+//            mRecyclerView.setVisibility(View.INVISIBLE);
+//        }
+//
+//        @Override
+//        protected ArrayList<Movies> doInBackground(String... params) {
+//            String[] jsonResults = new String[nbPages];
+//            JSONObject jsonObj[] = new JSONObject[nbPages];
+//            JSONArray pop[] = new JSONArray[nbPages];
+//
+//            for (int i = 0; i < nbPages; i++) {
+//                jsonResults[i] = NetworkUtils.doTmdbQuery(params[0], String.valueOf(i + 1));
+//            }
+//            if (jsonResults[0] == null) {return null;}
+//            try {
+//                for (int i = 0; i < nbPages; i++) {
+//                    jsonObj[i] = new JSONObject(jsonResults[i]);
+//                    pop[i] = jsonObj[i].getJSONArray("results");
+//                    for (int j = 0; j < pop[i].length(); j++) {
+//                        Gson gson = new Gson();
+//                        Movies movie = gson.fromJson(pop[i].getJSONObject(j).toString(), Movies.class);
+//                        movies.add(movie);
+//                    }
+//                }
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//            return movies;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(ArrayList<Movies> movies) {
+//            super.onPostExecute(movies);
+//            mProgressBar.setVisibility(View.INVISIBLE);
+//            if (movies != null) {
+//                mRecyclerView.setVisibility(View.VISIBLE);
+//                mMovieAdapter.setMovieData(movies);
+//                updateMovies(movies);
+//            } else {
+//                showErrorMessage();
+//            }
+//        }
+//    }
 
     private void showErrorMessage() {
         mProgressBar.setVisibility(View.INVISIBLE);

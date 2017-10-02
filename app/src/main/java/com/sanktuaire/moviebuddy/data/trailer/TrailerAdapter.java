@@ -1,9 +1,7 @@
 package com.sanktuaire.moviebuddy.data.trailer;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +10,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.sanktuaire.moviebuddy.R;
-import com.sanktuaire.moviebuddy.fragmentDetailView.FragmentTrailer;
 
 
 import java.util.List;

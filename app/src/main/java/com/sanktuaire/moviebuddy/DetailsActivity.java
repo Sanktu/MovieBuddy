@@ -124,7 +124,10 @@ public class DetailsActivity extends AppCompatActivity {
             ContextWrapper cw = new ContextWrapper(getBaseContext());
             File directory = cw.getDir("posters", Context.MODE_PRIVATE);
             File myImageFile = new File(directory, mov.getPoster_path().substring(1));
-            Picasso.with(getBaseContext()).load(myImageFile).into(mPosterDetails);
+            Picasso.with(getBaseContext()).load(myImageFile)
+                    .placeholder(R.drawable.movieplaceholder)
+                    .error(R.drawable.movieplaceholder)
+                    .into(mPosterDetails);
         } else {
             Uri.Builder uri = new Uri.Builder();
             uri.scheme("http")
@@ -136,6 +139,8 @@ public class DetailsActivity extends AppCompatActivity {
             else
                 uri.appendPath("w342");
             Picasso.with(this).load(uri.build().toString() + mov.getPoster_path())
+                    .placeholder(R.drawable.movieplaceholder)
+                    .error(R.drawable.movieplaceholder)
                     .into(mPosterDetails);
         }
         mAppCompatRatingBar.setOnTouchListener(new View.OnTouchListener() {

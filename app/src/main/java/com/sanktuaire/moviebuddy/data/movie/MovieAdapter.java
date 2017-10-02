@@ -24,14 +24,16 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     private List<Movies>                mMovies;
     private Context                     mContext;
     final private MovieClickListener    mOnClickListener;
+    private int                         width_pic;
 
     public interface MovieClickListener {
         void onMovieClick(int clickIndex);
     }
 
-    public MovieAdapter(MainActivity mainActivity, MovieClickListener listener) {
+    public MovieAdapter(MainActivity mainActivity, MovieClickListener listener, int columns, int width) {
         mContext = mainActivity.getApplicationContext();
         mOnClickListener = listener;
+        this.width_pic = width/columns;
     }
 
     @Override
@@ -48,7 +50,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             ContextWrapper cw = new ContextWrapper(mContext);
             File directory = cw.getDir("posters", Context.MODE_PRIVATE);
             File myImageFile = new File(directory, movie.getPoster_path().substring(1));
-            Picasso.with(mContext).load(myImageFile).into(holder.img_movie);
+            Picasso.with(mContext).load(myImageFile)
+                    .resize(width_pic, ((int) Math.round(width_pic * 1.5)))
+                    .placeholder(R.drawable.movieplaceholder)
+                    .error(R.drawable.movieplaceholder)
+                    .into(holder.img_movie);
         } else {
             int dpi = mContext.getResources().getDisplayMetrics().densityDpi;
             Uri.Builder uri = new Uri.Builder();
@@ -60,7 +66,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
                 uri.appendPath("w185");
             else
                 uri.appendPath("w342");
-            Picasso.with(mContext).load(uri.build().toString() + movie.getPoster_path()).into(holder.img_movie);
+            Picasso.with(mContext).load(uri.build().toString() + movie.getPoster_path())
+                    .resize(width_pic, ((int) Math.round(width_pic * 1.5)))
+                    .placeholder(R.drawable.movieplaceholder)
+                    .error(R.drawable.movieplaceholder)
+                    .into(holder.img_movie);
         }
     }
 

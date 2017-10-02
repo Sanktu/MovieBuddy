@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private boolean             mPopular;
     private String              mode;
     private String              oldMode;
+    private int                 columns;
+    private int                 width;
     public static final int     nbPages = 3;
 
     @Override
@@ -53,17 +56,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        int columns;
+        columns = numberOfColumns();
 
-        if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-            columns = 4;
-        else
-            columns = 5;
+//        if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+//            columns = 4;
+//        else
+//            columns = 5;
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, columns);
         ItemOffsetDecoration itemDecoration = new ItemOffsetDecoration(this, R.dimen.item_offset);
         mRecyclerView.addItemDecoration(itemDecoration);
         mRecyclerView.setLayoutManager(layoutManager);
-        mMovieAdapter = new MovieAdapter(this, this);
+        mMovieAdapter = new MovieAdapter(this, this, columns, width);
         mRecyclerView.setAdapter(mMovieAdapter);
         mode = oldMode = POPULAR;
 
@@ -77,6 +80,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             mMovieAdapter.notifyDataSetChanged();
         } else
             loadMovies();
+    }
+
+    private int numberOfColumns() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int dpi = getResources().getDisplayMetrics().densityDpi;
+
+        int widthDivider = (dpi <= 320) ? 185 : 342;
+        width = displayMetrics.widthPixels;
+        int nColumns = width / widthDivider;
+        if (nColumns < 2) return 3;
+        if (nColumns > 7) return 7;
+        return nColumns;
     }
 
     @Override

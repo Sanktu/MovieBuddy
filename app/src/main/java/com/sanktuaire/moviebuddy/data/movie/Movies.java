@@ -13,6 +13,7 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.sanktuaire.moviebuddy.R;
 import com.sanktuaire.moviebuddy.data.review.Review;
 import com.sanktuaire.moviebuddy.data.review.ReviewContract;
 import com.sanktuaire.moviebuddy.data.trailer.Trailer;

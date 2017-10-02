@@ -58,7 +58,7 @@ public class Trailer implements Parcelable {
     }
 
     public String getSource() {
-        return "https://www.youtube.com/watch?v=" + source;
+        return source;
     }
 
     public void setSource(String link) {

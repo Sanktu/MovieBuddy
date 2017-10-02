@@ -24,8 +24,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -44,7 +42,7 @@ public class FragmentTrailer extends Fragment {
 
     public FragmentTrailer() {
         mFetchTrailTask = new FetchTrailTask();
-        mTrailerAdapter = new TrailerAdapter(this);
+        mTrailerAdapter = new TrailerAdapter();
     }
 
 
@@ -117,6 +115,5 @@ public class FragmentTrailer extends Fragment {
         super.onSaveInstanceState(outState);
         outState.putParcelable(Intent.EXTRA_LOCAL_ONLY, movie);
     }
-
 
 }

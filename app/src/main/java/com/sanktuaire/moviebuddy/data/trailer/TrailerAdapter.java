@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.sanktuaire.moviebuddy.R;
+import com.sanktuaire.moviebuddy.fragmentDetailView.FragmentTrailer;
 
 
 import java.util.List;
@@ -22,14 +23,13 @@ import java.util.List;
  */
 
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHolder> {
-    private List<Trailer>   mTrailers;
-    private Context         mContext;
-    private ImageButton     playButton;
-    private TextView        trailer_name;
-    private TextView        hd;
+    private final static String YOUTUBE_LINK = "https://www.youtube.com/watch?v=";
+    private List<Trailer>       mTrailers;
+    private ImageButton         playButton;
+    private TextView            trailer_name;
+    private TextView            hd;
 
-    public TrailerAdapter(Fragment fragment) {
-        mContext = fragment.getContext();
+    public TrailerAdapter() {
     }
 
 
@@ -52,8 +52,8 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(trailer.getSource()));
-                mContext.startActivity(intent);
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(YOUTUBE_LINK + trailer.getSource()));
+                v.getContext().startActivity(intent);
             }
         });
     }

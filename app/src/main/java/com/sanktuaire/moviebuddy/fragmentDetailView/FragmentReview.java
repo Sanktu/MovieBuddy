@@ -48,16 +48,14 @@ public class FragmentReview extends Fragment implements ReviewAdapter.ReviewClic
     @BindView(R.id.recycler_view_fr)
     RecyclerView mRecyclerView;
 
-    //private ArrayList<Review>   mReviews;
     private ReviewAdapter       mReviewAdapter;
-    private Context             mContext;
     private View                mLastView;
     private Movies              movie;
     public FetchReviewTask      mFetchReviewTask;
 
     public FragmentReview() {
         mFetchReviewTask = new FetchReviewTask();
-        mReviewAdapter = new ReviewAdapter(this, this);
+        mReviewAdapter = new ReviewAdapter(this);
     }
 
     @Nullable
@@ -79,11 +77,6 @@ public class FragmentReview extends Fragment implements ReviewAdapter.ReviewClic
         }
 
         mReviewAdapter.setReviewsData(movie.getReviews());
-//        if (movie.getReviews().size() == 0)
-//            new FetchReviewTask().execute(movie.getId());
-//        else {
-//            mReviewAdapter.setReviewsData(movie.getReviews());
-//        }
 
         return rootView;
     }
@@ -127,7 +120,6 @@ public class FragmentReview extends Fragment implements ReviewAdapter.ReviewClic
 
     public class FetchReviewTask extends AsyncTask<String, Void, Movies> {
 
-        //private ArrayList<Review> mReviews = new ArrayList<>();
         private static final String REVIEWS = "reviews";
 
         @Override
@@ -141,7 +133,6 @@ public class FragmentReview extends Fragment implements ReviewAdapter.ReviewClic
                     Gson gson = new Gson();
                     Review review = gson.fromJson(pop.getJSONObject(i).toString(), Review.class);
                     movie.addReview(review);
-                    //mReviews.add(review);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

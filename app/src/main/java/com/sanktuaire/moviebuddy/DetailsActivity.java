@@ -1,6 +1,8 @@
 package com.sanktuaire.moviebuddy;
 
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -15,13 +17,11 @@ import android.support.v7.widget.AppCompatRatingBar;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.sanktuaire.moviebuddy.data.movie.MovieAdapter;
 import com.sanktuaire.moviebuddy.data.movie.Movies;
 import com.sanktuaire.moviebuddy.data.review.Review;
 import com.sanktuaire.moviebuddy.data.review.ReviewContract;
@@ -33,6 +33,8 @@ import com.sanktuaire.moviebuddy.fragmentDetailView.FragmentTrailer;
 import com.sanktuaire.moviebuddy.fragmentDetailView.SectionsPageAdapter;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,10 +44,8 @@ import butterknife.ButterKnife;
 public class DetailsActivity extends AppCompatActivity {
 
     public static final String  OVERVIEW = "overview";
-    public static final String  MOVIE_ID = "movieID";
     public static final String  MOVIE_BUNDLE = "movieBundle";
     private Movies              movie;
-    private boolean             isFavorite;
 
     @BindView(R.id.poster_details)
     ImageView mPosterDetails;
@@ -63,8 +63,6 @@ public class DetailsActivity extends AppCompatActivity {
     TabLayout mTabLayout;
     @BindView(R.id.pager)
     ViewPager mViewPager;
-    @BindView(R.id.buttonDB)
-    Button buttonDB;
 
     private SectionsPageAdapter mSectionsAdapter;
 
@@ -76,18 +74,10 @@ public class DetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_details);
         ButterKnife.bind(this);
 
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null)
             movie = savedInstanceState.getParcelable(Intent.EXTRA_LOCAL_ONLY);
-        }
-
-
-
 
         Intent intent = getIntent();
-//        if (intent != null && intent.hasExtra(Intent.EXTRA_LOCAL_ONLY)) {
-//            Toast.makeText(this, "WE GOT THE MOVIES?", Toast.LENGTH_SHORT).show();
-//            movies = intent.getParcelableArrayListExtra(Intent.EXTRA_LOCAL_ONLY);
-//        }
 
         if (intent == null || !intent.hasExtra(Intent.EXTRA_TEXT))
             mTitleDetails.setText(R.string.intent_error);
@@ -113,15 +103,6 @@ public class DetailsActivity extends AppCompatActivity {
         mReleaseDateDetails.setText(mov.getRelease_date().split("-")[0]);
         mAppCompatRatingBar.setRating(mov.getVote_average() / 2);
 
-        /* DEBUG BUTTON FOR DB*/
-        buttonDB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent dbmanager = new Intent(getApplicationContext(), AndroidDatabaseManager.class);
-                startActivity(dbmanager);
-            }
-        });
-
         if (mov.isFavorite()) {
             favorite.setImageResource(android.R.drawable.btn_star_big_on);
             favorite.setTag(Boolean.TRUE);
@@ -132,9 +113,14 @@ public class DetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (favorite.getTag() == Boolean.FALSE) {
-                    mov.setFavorite(getApplicationContext());
+                    try {
+                        mov.setFavorite(getApplicationContext());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     favorite.setImageResource(android.R.drawable.btn_star_big_on);
                     favorite.setTag(Boolean.TRUE);
+
                 } else {
                     mov.removeFavorite(getApplicationContext());
                     favorite.setImageResource(android.R.drawable.btn_star_big_off);
@@ -142,18 +128,25 @@ public class DetailsActivity extends AppCompatActivity {
                 }
             }
         });
-        Uri.Builder uri = new Uri.Builder();
-        uri.scheme("http")
-                .authority("image.tmdb.org")
-                .appendPath("t")
-                .appendPath("p");
-        if (dpi <= 320)
-            uri.appendPath("w185");
-        else
-            uri.appendPath("w342");
-        Picasso.with(this).load(uri.build().toString() + mov.getPoster_path())
-                .into(mPosterDetails);
 
+        if (mov.isFavorite()) {
+            ContextWrapper cw = new ContextWrapper(getBaseContext());
+            File directory = cw.getDir("posters", Context.MODE_PRIVATE);
+            File myImageFile = new File(directory, mov.getPoster_path().substring(1));
+            Picasso.with(getBaseContext()).load(myImageFile).into(mPosterDetails);
+        } else {
+            Uri.Builder uri = new Uri.Builder();
+            uri.scheme("http")
+                    .authority("image.tmdb.org")
+                    .appendPath("t")
+                    .appendPath("p");
+            if (dpi <= 320)
+                uri.appendPath("w185");
+            else
+                uri.appendPath("w342");
+            Picasso.with(this).load(uri.build().toString() + mov.getPoster_path())
+                    .into(mPosterDetails);
+        }
         mAppCompatRatingBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -168,7 +161,6 @@ public class DetailsActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager, SectionsPageAdapter adapter, Movies movie) {
         Bundle bundle = new Bundle();
         bundle.putString(OVERVIEW, movie.getOverview());
-//        bundle.putString(MOVIE_ID, movie.getId());
         bundle.putParcelable(MOVIE_BUNDLE, movie);
 
         FragmentOverview fragmentOverview = new FragmentOverview();
@@ -260,13 +252,6 @@ public class DetailsActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d("???? => ", "DO WE GET THERE????");
         outState.putParcelable(Intent.EXTRA_LOCAL_ONLY, movie);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
     }
 }

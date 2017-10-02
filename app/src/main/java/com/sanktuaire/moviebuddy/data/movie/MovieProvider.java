@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.sanktuaire.moviebuddy.data.review.Review;
 import com.sanktuaire.moviebuddy.data.review.ReviewContract;
 import com.sanktuaire.moviebuddy.data.trailer.TrailerContract;
 
@@ -31,28 +30,11 @@ public class MovieProvider extends ContentProvider {
 
 
     private static UriMatcher buildUriMatcher() {
-        /*
-         * All paths added to the UriMatcher have a corresponding code to return when a match is
-         * found. The code passed into the constructor of UriMatcher here represents the code to
-         * return for the root URI. It's common to use NO_MATCH as the code for this case.
-         */
+
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = MovieContract.CONTENT_AUTHORITY;
 
-        /*
-         * For each type of URI you want to add, create a corresponding code. Preferably, these are
-         * constant fields in your class so that you can use them throughout the class and you no
-         * they aren't going to change. In Sunshine, we use CODE_WEATHER or CODE_WEATHER_WITH_DATE.
-         */
-
-        /* This URI is content://com.example.android.sunshine/weather/ */
         matcher.addURI(authority, MovieContract.PATH_MOVIES, CODE_MOVIES);
-
-        /*
-         * This URI would look something like content://com.example.android.sunshine/weather/1472214172
-         * The "/#" signifies to the UriMatcher that if PATH_WEATHER is followed by ANY number,
-         * that it should return the CODE_WEATHER_WITH_DATE code
-         */
         matcher.addURI(authority, MovieContract.PATH_MOVIES + "/#", CODE_MOVIE_WITH_ID);
 
         matcher.addURI(authority, ReviewContract.PATH_REVIEWS, CODE_REVIEWS);
@@ -61,21 +43,7 @@ public class MovieProvider extends ContentProvider {
         return matcher;
     }
 
-    /**
-     * In onCreate, we initialize our content provider on startup. This method is called for all
-     * registered content providers on the application main thread at application launch time.
-     * It must not perform lengthy operations, or application startup will be delayed.
-     *
-     * Nontrivial initialization (such as opening, upgrading, and scanning
-     * databases) should be deferred until the content provider is used (via {@link #query},
-     * {@link #bulkInsert(Uri, ContentValues[])}, etc).
-     *
-     * Deferred initialization keeps application startup fast, avoids unnecessary work if the
-     * provider turns out not to be needed, and stops database errors (such as a full disk) from
-     * halting application launch.
-     *
-     * @return true if the provider was successfully loaded, false otherwise
-     */
+
     @Override
     public boolean onCreate() {
         mOpenHelper = new MovieDbHelper(getContext());
@@ -204,8 +172,6 @@ public class MovieProvider extends ContentProvider {
 
         int numRowsDeleted;
 
-        if (null == selection) selection = "1";
-
         switch (sUriMatcher.match(uri)) {
 
             case CODE_MOVIE_WITH_ID:
@@ -241,7 +207,6 @@ public class MovieProvider extends ContentProvider {
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
-        //TODO-1 IMPLEMENT UPDATE IN CASE NEW REVIEWS OR TRAILERS ARE ADDED OR DELETED
         return 0;
     }
 }

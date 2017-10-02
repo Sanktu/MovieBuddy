@@ -1,10 +1,10 @@
 package com.sanktuaire.moviebuddy.data.movie;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
+import android.content.ContextWrapper;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import com.sanktuaire.moviebuddy.MainActivity;
 import com.sanktuaire.moviebuddy.R;
 import com.squareup.picasso.Picasso;
+
+import java.io.File;
 import java.util.List;
 
 /**
@@ -42,17 +44,25 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(MovieAdapter.ViewHolder holder, int position) {
         Movies movie = mMovies.get(position);
-        int dpi = mContext.getResources().getDisplayMetrics().densityDpi;
-        Uri.Builder uri = new Uri.Builder();
-        uri.scheme("http")
-                .authority("image.tmdb.org")
-                .appendPath("t")
-                .appendPath("p");
-        if (dpi <= 320)
-            uri.appendPath("w185");
-        else
-            uri.appendPath("w342");
-        Picasso.with(mContext).load(uri.build().toString() + movie.getPoster_path()).into(holder.img_movie);
+
+        if (movie.isFavorite()) {
+            ContextWrapper cw = new ContextWrapper(mContext);
+            File directory = cw.getDir("posters", Context.MODE_PRIVATE);
+            File myImageFile = new File(directory, movie.getPoster_path().substring(1));
+            Picasso.with(mContext).load(myImageFile).into(holder.img_movie);
+        } else {
+            int dpi = mContext.getResources().getDisplayMetrics().densityDpi;
+            Uri.Builder uri = new Uri.Builder();
+            uri.scheme("http")
+                    .authority("image.tmdb.org")
+                    .appendPath("t")
+                    .appendPath("p");
+            if (dpi <= 320)
+                uri.appendPath("w185");
+            else
+                uri.appendPath("w342");
+            Picasso.with(mContext).load(uri.build().toString() + movie.getPoster_path()).into(holder.img_movie);
+        }
     }
 
     @Override

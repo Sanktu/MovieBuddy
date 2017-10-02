@@ -19,7 +19,6 @@ import java.util.List;
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder> {
 
     private List<Review>                mReviews;
-    private final Context               mContext;
     private TextView                    tvContent;
     private TextView                    tvAuthor;
     final private ReviewClickListener   mOnClickListener;
@@ -28,8 +27,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
         void onReviewClick(int clickIndex, View v);
     }
 
-    public ReviewAdapter(Fragment fragment, ReviewClickListener listener) {
-        mContext = fragment.getContext();
+    public ReviewAdapter(ReviewClickListener listener) {
         mOnClickListener = listener;
     }
 
@@ -48,7 +46,6 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
         tvAuthor.setText(review.getAuthor());
         if (position == 0) {
             tvContent.setText(review.getContent());
-//            tvContent.setTag(R.id.ITEM_POSITION, position);
             tvContent.setTag(Boolean.TRUE);
         }
         else {
@@ -83,16 +80,6 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
         public void onClick(View v) {
             int clickedPosition = getAdapterPosition();
             mOnClickListener.onReviewClick(clickedPosition, v);
-//            Log.d("HAHAHAHAH", String.valueOf(clickedPosition));
-//            if (tvContent.getTag() == Boolean.TRUE) {
-//                tvContent.setText(mReviews.get(clickedPosition).getExcerpt());
-//                tvContent.setTag(Boolean.FALSE);
-//            } else {
-//                tvContent.setText(mReviews.get(clickedPosition).getContent());
-//                tvContent.setTag(Boolean.TRUE);
-//            }
-//            tvContent.setVisibility(View.INVISIBLE);
-//            tvContent.setVisibility(View.VISIBLE);
         }
 
     }

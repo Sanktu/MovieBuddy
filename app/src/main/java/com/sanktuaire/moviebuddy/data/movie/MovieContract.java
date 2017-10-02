@@ -41,7 +41,6 @@ public class MovieContract {
         /* Release date is stored as a string (year of release) */
         public static final String COLUMN_RELEASE_DATE = "release_date";
 
-        /* Poster and backdrop will be stored as blob  */
         public static final String COLUMN_POSTER = "poster";
         public static final String COLUMN_BACKDROP = "backdrop";
 

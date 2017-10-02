@@ -1,8 +1,10 @@
 package com.sanktuaire.moviebuddy;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.sanktuaire.moviebuddy.data.movie.MovieAdapter;
+import com.sanktuaire.moviebuddy.data.movie.MovieContract;
 import com.sanktuaire.moviebuddy.data.movie.Movies;
 import com.sanktuaire.moviebuddy.utils.ItemOffsetDecoration;
 import com.sanktuaire.moviebuddy.utils.NetworkUtils;
@@ -31,16 +34,22 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+
 public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieClickListener{
 
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
     @BindView(R.id.progress_bar)
     ProgressBar mProgressBar;
+    private final String        POPULAR = "popular";
+    private final String        TOP_RATED = "top_rated";
+    private final String        FAVORITE = "favorite";
     private ArrayList<Movies>   movies;
     private MovieAdapter        mMovieAdapter;
     private Menu                mMenu;
     private boolean             mPopular;
+    private String              mode;
+    private String              oldMode;
     public static final int     nbPages = 3;
 
     @Override
@@ -61,11 +70,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mRecyclerView.setLayoutManager(layoutManager);
         mMovieAdapter = new MovieAdapter(this, this);
         mRecyclerView.setAdapter(mMovieAdapter);
-        setPopular(true);
+        mode = oldMode = POPULAR;
 
         // If Data already fetched, no need to do it again when we rotate or recreate activity
         if (savedInstanceState != null) {
             movies = savedInstanceState.getParcelableArrayList(Intent.EXTRA_LOCAL_ONLY);
+            String savedMode = savedInstanceState.getString(Intent.CATEGORY_CAR_MODE);
+            if (savedMode != null)
+                mode = savedMode;
             mMovieAdapter.setMovieData(movies);
             mMovieAdapter.notifyDataSetChanged();
         } else
@@ -80,28 +92,81 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             Movies movie = movies.get(clickedItem);
             if (movie.isFav(this))
                 movie.setFav(true);
-            intent.putExtra(Intent.EXTRA_TEXT, movie);
-            //intent.putParcelableArrayListExtra(Intent.EXTRA_LOCAL_ONLY, movies);
-            startActivity(intent);
+            if (isOnline() || movie.isFavorite()) {
+                intent.putExtra(Intent.EXTRA_TEXT, movie);
+                startActivity(intent);
+            } else
+                Toast.makeText(this, R.string.check_internet, Toast.LENGTH_SHORT).show();
         }
     }
 
     private void loadMovies() {
         if (!isOnline()) {
             Toast.makeText(this, R.string.check_internet, Toast.LENGTH_SHORT).show();
-            return;
+            Toast.makeText(this, R.string.switchfav, Toast.LENGTH_SHORT).show();
+            mode = FAVORITE;
         }
-        if (isPopular())
-            new FetchTMDBTask().execute("popular");
-        else
-            new FetchTMDBTask().execute("top_rated");
+
+        switch (mode) {
+            case POPULAR:
+                new FetchTMDBTask().execute(POPULAR);
+                break;
+            case TOP_RATED:
+                new FetchTMDBTask().execute(TOP_RATED);
+                break;
+            case FAVORITE:
+                loadFavMovies();
+                break;
+            default:
+                new FetchTMDBTask().execute(POPULAR);
+        }
     }
 
     private void loadFavMovies() {
-        
+
+        mProgressBar.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.INVISIBLE);
+        ContentResolver cr = getContentResolver();
+        String[] mProjection =
+                {
+                        MovieContract.MovieEntry._ID,
+                        MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE,
+                        MovieContract.MovieEntry.COLUMN_TITLE,
+                        MovieContract.MovieEntry.COLUMN_OVERVIEW,
+                        MovieContract.MovieEntry.COLUMN_RATING,
+                        MovieContract.MovieEntry.COLUMN_POSTER,
+                        MovieContract.MovieEntry.COLUMN_BACKDROP,
+                        MovieContract.MovieEntry.COLUMN_RELEASE_DATE
+                };
+
+        Cursor c = cr.query(MovieContract.MovieEntry.CONTENT_URI,
+                mProjection,
+                null,
+                null,
+                null);
+
+        movies = new ArrayList<>();
+
+        while (c.moveToNext()) {
+            String id = c.getString(c.getColumnIndex(MovieContract.MovieEntry._ID));
+            String originalTitle = c.getString(c.getColumnIndex(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE));
+            String title = c.getString(c.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE));
+            String overview = c.getString(c.getColumnIndex(MovieContract.MovieEntry.COLUMN_OVERVIEW));
+            String rating = c.getString(c.getColumnIndex(MovieContract.MovieEntry.COLUMN_RATING));
+            String posterPath = c.getString(c.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER));
+            String backdropPath = c.getString(c.getColumnIndex(MovieContract.MovieEntry.COLUMN_BACKDROP));
+            String releaseDate = c.getString(c.getColumnIndex(MovieContract.MovieEntry.COLUMN_RELEASE_DATE));
+
+            Movies movie = new Movies(id, originalTitle, title, overview, Float.valueOf(rating), posterPath, backdropPath, releaseDate);
+            movie.setFav(true);
+            movies.add(movie);
+        }
+
+        c.close();
+        mProgressBar.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
         mMovieAdapter.setMovieData(movies);
-        updateMovies(movies);
+        mMovieAdapter.notifyDataSetChanged();
     }
 
 
@@ -113,6 +178,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         mMenu = menu;
+        if (mode.equals(FAVORITE))
+            mMenu.findItem(R.id.favorite).setIcon(android.R.drawable.btn_star_big_on);
         return true;
     }
 
@@ -123,24 +190,36 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         int idrate = R.id.top_rated;
         int idfav = R.id.favorite;
 
-
-        if (id == idpop && !isPopular()) {
-            setPopular(true);
+        if (id == idpop && !mode.equals(POPULAR)) {
+            mode = oldMode = POPULAR;
             mMenu.findItem(R.id.most_popular_menu).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             mMenu.findItem(R.id.top_rated).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-            mMenu.findItem(idfav).setIcon(android.R.drawable.btn_star_big_off);
+            if (isOnline())
+                mMenu.findItem(idfav).setIcon(android.R.drawable.btn_star_big_off);
+            else
+                mMenu.findItem(idfav).setIcon(android.R.drawable.btn_star_big_on);
             loadMovies();
         }
-        if (id == idrate && isPopular()) {
-            setPopular(false);
-            mMenu.findItem(R.id.most_popular_menu).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        if (id == idrate && !mode.equals(TOP_RATED)) {
+            mode = oldMode = TOP_RATED;
             mMenu.findItem(R.id.top_rated).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            mMenu.findItem(idfav).setIcon(android.R.drawable.btn_star_big_off);
+            mMenu.findItem(R.id.most_popular_menu).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            if (isOnline())
+                mMenu.findItem(idfav).setIcon(android.R.drawable.btn_star_big_off);
+            else
+                mMenu.findItem(idfav).setIcon(android.R.drawable.btn_star_big_on);
             loadMovies();
         }
-        if (id == idfav) {
+        if (id == idfav && !mode.equals(FAVORITE)) {
+            oldMode = mode;
+            mode = FAVORITE;
             mMenu.findItem(idfav).setIcon(android.R.drawable.btn_star_big_on);
-            loadFavMovies();
+            loadMovies();
+        } else if (id == idfav && mode.equals(FAVORITE)) {
+            mode = oldMode;
+            if (isOnline())
+                mMenu.findItem(idfav).setIcon(android.R.drawable.btn_star_big_off);
+            loadMovies();
         }
 
         return super.onOptionsItemSelected(item);
@@ -215,9 +294,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(Intent.EXTRA_LOCAL_ONLY, movies);
+        outState.putString(Intent.CATEGORY_CAR_MODE, mode);
     }
 
-    public boolean isOnline() {
+    private boolean isOnline() {
         ConnectivityManager cm =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
@@ -228,6 +308,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         movies = savedInstanceState.getParcelableArrayList(Intent.EXTRA_LOCAL_ONLY);
+        mode = savedInstanceState.getString(Intent.CATEGORY_CAR_MODE);
         mMovieAdapter.setMovieData(movies);
         mMovieAdapter.notifyDataSetChanged();
     }

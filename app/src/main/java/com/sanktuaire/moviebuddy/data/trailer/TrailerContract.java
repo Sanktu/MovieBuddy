@@ -20,7 +20,7 @@ public class TrailerContract {
     public static final String PATH_TRAILERS = "trailers";
 
     public static final class TrailerEntry implements BaseColumns {
-        /* The base CONTENT_URI used to query the Weather table from the content provider */
+
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_TRAILERS)
                 .build();

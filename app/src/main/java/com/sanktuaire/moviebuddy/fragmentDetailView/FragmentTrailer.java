@@ -1,9 +1,7 @@
 package com.sanktuaire.moviebuddy.fragmentDetailView;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,14 +15,9 @@ import android.view.ViewGroup;
 import com.google.gson.Gson;
 import com.sanktuaire.moviebuddy.DetailsActivity;
 import com.sanktuaire.moviebuddy.R;
-import com.sanktuaire.moviebuddy.data.movie.MovieAdapter;
-import com.sanktuaire.moviebuddy.data.movie.MovieContract;
 import com.sanktuaire.moviebuddy.data.movie.Movies;
-import com.sanktuaire.moviebuddy.data.review.Review;
-import com.sanktuaire.moviebuddy.data.review.ReviewContract;
 import com.sanktuaire.moviebuddy.data.trailer.Trailer;
 import com.sanktuaire.moviebuddy.data.trailer.TrailerAdapter;
-import com.sanktuaire.moviebuddy.data.trailer.TrailerContract;
 import com.sanktuaire.moviebuddy.utils.NetworkUtils;
 
 import org.json.JSONArray;
@@ -32,7 +25,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,9 +38,7 @@ public class FragmentTrailer extends Fragment {
     @BindView(R.id.recycler_view_ft)
     RecyclerView mRecyclerView;
 
-    private ArrayList<Trailer>  mTrailers;
     private TrailerAdapter      mTrailerAdapter;
-    private Context             mContext;
     private Movies              movie;
     public FetchTrailTask       mFetchTrailTask;
 
@@ -88,7 +78,6 @@ public class FragmentTrailer extends Fragment {
 
     public class FetchTrailTask extends AsyncTask<String, Void, Movies> {
 
-        private ArrayList<Trailer> mTrailers = new ArrayList<>();
         private static final String TRAILERS = "trailers";
 
         @Override
